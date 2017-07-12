@@ -17,6 +17,24 @@ jobs:
     working_directory: ~/repo
 
     steps:
+      - run:
+          name: Install Python
+          command: |
+            sudo apt-get install python-dev
+            sudo apt-get install rsync
+
+      - run:
+          name: Optionally Install AWS CLI
+          command: |
+            if [ ! -d "/usr/local/aws" ]; then
+              mkdir ~/tmp
+              pushd ~/tmp >/dev/null
+              curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+              unzip awscli-bundle.zip
+              sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+              popd >/dev/null
+            fi
+
       - checkout
 
       # Download and cache dependencies
@@ -36,4 +54,35 @@ jobs:
       # run tests!
       - run: yarn test
 
+      - run:
+          name: Prepare build directory
+          command: |
+            temp_dir="temp-build-dir"
+            rm -rf $temp_dir
+            mkdir $temp_dir
+            rm -rf *.zip
+
+      - run:
+          name: Copy code
+          command: rsync -a --exclude=$temp_dir * $temp_dir/
+
+      - run:
+          name: Create ZIP package
+          command: |
+            pushd $temp_dir >/dev/null
+            package_name="demo-${CIRCLE_BUILD_NUM}-$(date +%s).zip"
+            zip -rq "$package_name" .
+            popd >/dev/null
+
+            mv "$temp_dir/$package_name" "./$package_name"
+            rm -rf $temp_dir
+
+      - deploy:
+          name: Upload application version (if master branch)
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ];
+            then 
+              aws s3 cp "./$package_name" "s3://elasticbeanstalk-us-west-2-563088126740/$package_name" --region us-west-2
+              aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label "master-${CIRCLE_BUILD_NUM}" --source-bundle "S3Bucket=elasticbeanstalk-us-west-2-563088126740,S3Key=$package_name" --region us-west-2
+            fi
 
