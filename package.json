@@ -1,0 +1,31 @@
+{
+  "name": "node-api-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TonyFNZ/node-api-demo.git"
+  },
+  "author": "TonyFNZ",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TonyFNZ/node-api-demo/issues"
+  },
+  "homepage": "https://github.com/TonyFNZ/node-api-demo#readme",
+  "dependencies": {
+    "bunyan": "^1.8.10",
+    "restify": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.2.0",
+    "mocha": "^3.4.2",
+    "should": "^11.2.1",
+    "supertest": "^3.0.0"
+  }
+}
