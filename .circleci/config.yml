@@ -8,6 +8,9 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:7.10
+        environment:
+          TEMP_DIR: temp-build-dir
+          PACKAGE_NAME: demo-${CIRCLE_BUILD_NUM}-$(date +%s).zip
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -57,28 +60,25 @@ jobs:
       - run:
           name: Copy code
           command: |
-            temp_dir="temp-build-dir"
-            rm -rf $temp_dir
-            mkdir $temp_dir
+            rm -rf $TEMP_DIR
+            mkdir $TEMP_DIR
             rm -rf *.zip
-            rsync -av * $temp_dir/ --exclude=$temp_dir
+            rsync -av * $TEMP_DIR/ --exclude=$temp_dir
 
       - run:
           name: Create ZIP package
           command: |
-            pushd $temp_dir >/dev/null
-            package_name="demo-${CIRCLE_BUILD_NUM}-$(date +%s).zip"
-            zip -rq "$package_name" .
+            pushd $TEMP_DIR >/dev/null
+            zip -rq "$PACKAGE_NAME" .
             popd >/dev/null
-
-            mv "$temp_dir/$package_name" "./$package_name"
-            rm -rf $temp_dir
+            mv "$TEMP_DIR/$PACKAGE_NAME" "./$PACKAGE_NAME"
+            rm -rf $TEMP_DIR
 
       - deploy:
           name: Upload application version (if master branch)
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ];
             then
-              aws s3 cp "./$package_name" "s3://elasticbeanstalk-us-west-2-563088126740/$package_name" --region us-west-2
-              aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label "master-${CIRCLE_BUILD_NUM}" --source-bundle "S3Bucket=elasticbeanstalk-us-west-2-563088126740,S3Key=$package_name" --region us-west-2
+              aws s3 cp "./$PACKAGE_NAME" "s3://elasticbeanstalk-us-west-2-563088126740/$PACKAGE_NAME" --region us-west-2
+              aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label "master-${CIRCLE_BUILD_NUM}" --source-bundle "S3Bucket=elasticbeanstalk-us-west-2-563088126740,S3Key=$PACKAGE_NAME" --region us-west-2
             fi
