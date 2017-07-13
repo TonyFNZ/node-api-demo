@@ -10,7 +10,7 @@ jobs:
       - image: circleci/node:7.10
         environment:
           TEMP_DIR: temp-build-dir
-          PACKAGE_NAME: demo-${CIRCLE_BUILD_NUM}-$(date +%s).zip
+          PACKAGE_NAME: demo-$CIRCLE_BUILD_NUM-$(date +%s).zip
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -80,5 +80,5 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ];
             then
               aws s3 cp "./$PACKAGE_NAME" "s3://elasticbeanstalk-us-west-2-563088126740/$PACKAGE_NAME" --region us-west-2
-              aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label master-${CIRCLE_BUILD_NUM} --source-bundle S3Bucket="elasticbeanstalk-us-west-2-563088126740",S3Key="$PACKAGE_NAME" --region us-west-2
+              aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label master-$CIRCLE_BUILD_NUM --source-bundle S3Bucket="elasticbeanstalk-us-west-2-563088126740",S3Key="$PACKAGE_NAME" --region us-west-2
             fi
