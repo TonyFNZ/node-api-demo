@@ -1,7 +1,6 @@
 const restify = require('restify');
 const Bunyan = require('bunyan');
 
-
 const logger = new Bunyan.createLogger({ // eslint-disable-line new-cap
     name: 'Demo REST API',
     streams: [{
@@ -14,7 +13,7 @@ const logger = new Bunyan.createLogger({ // eslint-disable-line new-cap
 
 const server = restify.createServer({
     name: 'Demo REST API',
-    logger,
+    log: logger,
 });
 
 
@@ -37,18 +36,6 @@ server.use(restify.plugins.jsonBodyParser({ mapParams: false }));
 server.use(restify.plugins.queryParser());
 
 server.use(restify.plugins.requestLogger());
-
-
-/*server.on('after', restify.plugins.auditLogger({
-    log: Bunyan.createLogger({
-        name: 'audit',
-        streams: [{
-            stream: process.stdout,
-        }],
-        level: 'INFO',
-    }),
-    body: true,  // log req/res bodies
-}));*/
 
 
 module.exports = server;
