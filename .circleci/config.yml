@@ -55,13 +55,16 @@ jobs:
       - run: yarn test
 
       - run:
-          name: Copy code
+          name: Prepare build directory
           command: |
             temp_dir="temp-build-dir"
             rm -rf $temp_dir
             mkdir $temp_dir
             rm -rf *.zip
-            rsync -av * $temp_dir/ --exclude=$temp_dir
+
+      - run:
+          name: Copy code
+          command: rsync -av * $temp_dir/ --exclude=$temp_dir
 
       - run:
           name: Create ZIP package
