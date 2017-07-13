@@ -63,7 +63,7 @@ jobs:
             rm -rf $TEMP_DIR
             mkdir $TEMP_DIR
             rm -rf *.zip
-            rsync -av * $TEMP_DIR/ --exclude=$temp_dir
+            rsync -av * $TEMP_DIR/ --exclude=$TEMP_DIR
 
       - run:
           name: Create ZIP package
