@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:7.10
-      
+
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -50,21 +50,18 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-        
+
       # run tests!
       - run: yarn test
 
       - run:
-          name: Prepare build directory
+          name: Copy code
           command: |
             temp_dir="temp-build-dir"
             rm -rf $temp_dir
             mkdir $temp_dir
             rm -rf *.zip
-
-      - run:
-          name: Copy code
-          command: rsync -a --exclude=$temp_dir * $temp_dir/
+            rsync -av * $temp_dir/ --exclude=$temp_dir
 
       - run:
           name: Create ZIP package
@@ -81,8 +78,7 @@ jobs:
           name: Upload application version (if master branch)
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ];
-            then 
+            then
               aws s3 cp "./$package_name" "s3://elasticbeanstalk-us-west-2-563088126740/$package_name" --region us-west-2
               aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label "master-${CIRCLE_BUILD_NUM}" --source-bundle "S3Bucket=elasticbeanstalk-us-west-2-563088126740,S3Key=$package_name" --region us-west-2
             fi
-
