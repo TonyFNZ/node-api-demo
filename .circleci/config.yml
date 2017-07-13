@@ -68,7 +68,7 @@ jobs:
           name: Create ZIP package
           command: |
             pushd $TEMP_DIR >/dev/null
-            zip -rq "demo-$CIRCLE_BUILD_NUM.zip" .
+            zip -rq "demo-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip" .
             popd >/dev/null
             mv "$TEMP_DIR/demo-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip" "./demo-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip"
             rm -rf $TEMP_DIR
