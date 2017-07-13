@@ -70,7 +70,7 @@ jobs:
             pushd $TEMP_DIR >/dev/null
             zip -rq "demo-$CIRCLE_BUILD_NUM.zip" .
             popd >/dev/null
-            mv "$TEMP_DIR/demo-$CIRCLE_BUILD_NUM.zip" "./demo-$CIRCLE_BUILD_NUM.zip"
+            mv "$TEMP_DIR/demo-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip" "./demo-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip"
             rm -rf $TEMP_DIR
 
       - deploy:
@@ -78,6 +78,6 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ];
             then
-              aws s3 cp "./demo-$CIRCLE_BUILD_NUM.zip" "s3://elasticbeanstalk-us-west-2-563088126740/demo-$CIRCLE_BUILD_NUM.zip" --region us-west-2
-              aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label master-$CIRCLE_BUILD_NUM --source-bundle S3Bucket="elasticbeanstalk-us-west-2-563088126740",S3Key="master-$CIRCLE_BUILD_NUM.zip" --region us-west-2
+              aws s3 cp "./demo-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip" "s3://elasticbeanstalk-us-west-2-563088126740/master-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip" --region us-west-2
+              aws elasticbeanstalk create-application-version --application-name CircleCIDemo --version-label master-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1 --source-bundle S3Bucket="elasticbeanstalk-us-west-2-563088126740",S3Key="master-$CIRCLE_BUILD_NUM-$CIRCLE_SHA1.zip" --region us-west-2
             fi
